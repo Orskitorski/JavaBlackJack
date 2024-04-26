@@ -5,20 +5,12 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner tgb = new Scanner(System.in);
-        System.out.println("♦♥♣♠");
-        System.out.println("Welcome to Java-BlackJack!");
-        //int playerNumber = tgb.nextInt();
+        System.out.println("♦♥♣♠ Welcome to Java-BlackJack! ♦♥♣♠");
         System.out.println("Press enter to begin");
         String temp = tgb.nextLine();
-        /*
-        for (int i = 0; i < playerNumber; i++) {
-            System.out.println("What is the name of player " + (i+1) + "?");
-            playerNames[i] = tgb.next();
-        }
-         */
-        StartGame();
+        System.out.println("Your total score: " + StartGame());
     }
-    public static void StartGame() {
+    public static String StartGame() {
         Scanner tgb = new Scanner(System.in);
         String [] cardDeck = Shuffle();
         String [] dealersCards = new String[52];
@@ -64,16 +56,24 @@ public class Main {
                     System.out.print("]");
                     System.out.println(" ");
                     System.out.println(" ");
+                    int playersValue = PlayerValueCalculator(playersCards, playersCardNumber);
+                    System.out.println("Your current card value is: " + playersValue);
+                    if (playersValue > 21) {
+                        return "Bust";
+                    }
+                    if (playersValue == 21) {
+                        return "BlackJack";
+                    }
                 }
                 else if (answer.toLowerCase().contains("stand")) {
-                    j = 52;
                     break;
                 }
-
-                int playersValue = PlayerValueCalculator(playersCards, playersCardNumber);
-                System.out.println("Your current card value is: " + playersValue);
             }
         }
+
+
+
+        return String.valueOf(PlayerValueCalculator(playersCards, playersCardNumber));
     }
 
     public static String[] Shuffle() {
