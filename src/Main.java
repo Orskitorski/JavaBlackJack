@@ -23,6 +23,7 @@ public class Main {
         String [] cardDeck = new String[52];
         for (int i = 0; i < 13; i++) {
             cardDeck[i] = String.valueOf((i+1)) + "♦";
+            System.out.println(cardDeck[i]);
         }
     }
 }
