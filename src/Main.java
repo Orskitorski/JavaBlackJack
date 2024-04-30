@@ -5,75 +5,139 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner tgb = new Scanner(System.in);
+        int topCard = 0;
+        String [] dealersCards = new String[52];
+        String [] cardDeck = Shuffle();
+
         System.out.println("♦♥♣♠ Welcome to Java-BlackJack! ♦♥♣♠");
         System.out.println("Press enter to begin");
         String temp = tgb.nextLine();
-        System.out.println("Your total score: " + StartGame());
-    }
-    public static String StartGame() {
-        Scanner tgb = new Scanner(System.in);
-        String [] cardDeck = Shuffle();
-        String [] dealersCards = new String[52];
-        String [] playersCards = new String[52];
-        int dealersCardNumber = 0;
-        int playersCardNumber = 0;
-        int topCard = 0;
+        System.out.println("Dealers cards:");
+        for (; topCard < 2; topCard++) {
+            dealersCards[topCard] = cardDeck[topCard];
+        }
+        System.out.print("[?," + dealersCards[1] + "]");
+        System.out.println(" ");
+        System.out.println(" ");
 
-        for (int i = 0; i < 1; i++) {
-            System.out.println("Dealers cards:");
-            for (; topCard < 2; topCard++) {
-                dealersCards[topCard] = cardDeck[topCard];
-                cardDeck[topCard] = null;
-                dealersCardNumber++;
-            }
-            System.out.print("[?," + dealersCards[1] + "]");
-            System.out.println(" ");
-            System.out.println(" ");
-            System.out.println("Your cards:");
-            playersCards[0] = cardDeck[topCard];
-            playersCardNumber++;
-            cardDeck[topCard] = null;
-            topCard++;
-            System.out.print("[" +  playersCards[0] + "]");
-            System.out.println(" ");
-            System.out.println(" ");
-            for (int j = 1; j < 52; j++) {
-                System.out.println("Do you want to hit or stand?");
-                String answer = tgb.nextLine();
-                if (answer.toLowerCase().contains("hit")) {
-                    playersCardNumber++;
-                    playersCards[j] = cardDeck[topCard];
-                    cardDeck[topCard] = null;
-                    topCard++;
-                    System.out.println("Your cards:");
-                    System.out.print("[" + playersCards[0] + ",");
-                    for (int k = 1; k < j+1; k++) {
-                        System.out.print(playersCards[k]);
-                        if (k < j) {
-                            System.out.print(",");
-                        }
-                    }
-                    System.out.print("]");
-                    System.out.println(" ");
-                    System.out.println(" ");
-                    int playersValue = PlayerValueCalculator(playersCards, playersCardNumber);
-                    System.out.println("Your current card value is: " + playersValue);
-                    if (playersValue > 21) {
-                        return "Bust";
-                    }
-                    if (playersValue == 21) {
-                        return "BlackJack";
+        String [] playerResults = StartGame(topCard, cardDeck);
+        System.out.println("Your total score: " + playerResults[1]);
+        if (!playerResults[0].equals("Normal")) {
+            System.out.println(playerResults[0]);
+        }
+        System.out.println(" ");
+
+        String [] dealerResults = Dealer(Integer.parseInt(playerResults[2]), dealersCards, cardDeck);
+        System.out.println("Dealer's total score: " + dealerResults[1]);
+        if (!dealerResults[0].equals("Normal")) {
+            System.out.println(dealerResults[0]);
+        }
+
+        System.out.println(" ");
+        if (Integer.parseInt(dealerResults[1]) > Integer.parseInt(playerResults[1]) && dealerResults[0].equals("Normal") || Integer.parseInt(dealerResults[1]) > Integer.parseInt(playerResults[1]) && dealerResults[0].equals("BlackJack") || playerResults[0].equals("Bust") && dealerResults[0].equals("Normal") || playerResults[0].equals("Bust") && dealerResults[0].equals("BlackJack")) {
+            System.out.println("Dealer wins");
+        }
+        else if (dealerResults[0].equals("Bust") && playerResults[0].equals("Bust") || dealerResults[1].equals(playerResults[1])) {
+            System.out.println("Draw");
+        }
+        else {
+            System.out.println("Player wins");
+        }
+    }
+    public static String[] StartGame(int topCard, String[] cardDeck) {
+        Scanner tgb = new Scanner(System.in);
+        String [] playersCards = new String[52];
+        String result = null;
+        int playersCardNumber = 0;
+
+        System.out.println("Your cards:");
+        playersCards[0] = cardDeck[topCard];
+        playersCardNumber++;
+        topCard++;
+        System.out.print("[" +  playersCards[0] + "]");
+        System.out.println(" ");
+        System.out.println(" ");
+        for (int i = 1; i < 52; i++) {
+            System.out.println("Do you want to hit or stand?");
+            String answer = tgb.nextLine();
+            if (answer.toLowerCase().contains("hit")) {
+                playersCardNumber++;
+                playersCards[i] = cardDeck[topCard];
+                topCard++;
+                System.out.println("Your cards:");
+                System.out.print("[" + playersCards[0] + ",");
+                for (int j = 1; j < i+1; j++) {
+                    System.out.print(playersCards[j]);
+                    if (j < i) {
+                        System.out.print(",");
                     }
                 }
-                else if (answer.toLowerCase().contains("stand")) {
+                System.out.print("]");
+                System.out.println(" ");
+                System.out.println(" ");
+                int playersValue = ValueCalculator(playersCards, playersCardNumber);
+                System.out.println("Your current card value is: " + playersValue);
+                if (playersValue > 21) {
+                    result = "Bust";
+                    break;
+                }
+                else if (playersValue == 21) {
+                    result = "BlackJack";
+                    break;
+                }
+            }
+            else if (answer.toLowerCase().contains("stand")) {
+                break;
+            }
+        }
+
+        if (result == null) {
+            result = "Normal";
+        }
+        return new String[]{result, String.valueOf(ValueCalculator(playersCards, playersCardNumber)), String.valueOf(topCard)};
+    }
+
+    public static String [] Dealer(int topCard, String[] dealersCards, String[] cardDeck) {
+        int dealersCardNumber = 2;
+        int dealersValue = 0;
+        String result = null;
+        for (int i = topCard; i < 52 ; i++) {
+            for (int j = 2; j < 52; j++) {
+                dealersValue = ValueCalculator(dealersCards, dealersCardNumber);
+                if (dealersValue > 17) {
+                    i = 52;
+                    break;
+                }else {
+                    dealersCards[j] = cardDeck[topCard];
+                    topCard++;
+                    dealersCardNumber++;
+                }
+                System.out.println("Dealers cards:");
+                System.out.print("[" + dealersCards[0] + ",");
+                for (int l = 1; l < dealersCardNumber; l++) {
+                    System.out.print(dealersCards[l]);
+                    if (l < (dealersCardNumber-1)) {
+                        System.out.print(",");
+                    }
+                }
+                System.out.print("]");
+                System.out.println(" ");
+                System.out.println(" ");
+                dealersValue = ValueCalculator(dealersCards, dealersCardNumber);
+                if (dealersValue > 21) {
+                    result = "Bust";
+                    break;
+                }
+                else if (dealersValue == 21) {
+                    result = "BlackJack";
                     break;
                 }
             }
         }
-
-
-
-        return String.valueOf(PlayerValueCalculator(playersCards, playersCardNumber));
+        if (result == null) {
+            result = "Normal";
+        }
+        return new String[]{result, String.valueOf(dealersValue)};
     }
 
     public static String[] Shuffle() {
@@ -120,43 +184,36 @@ public class Main {
         return cardDeck;
     }
 
-    public static int PlayerValueCalculator(String [] playersCards, int playersCardNumber) {
-        int playersValue = 0;
-        for (int l = 0; l < playersCardNumber; l++) {
-            if (playersCards[l].contains("A") && playersValue < 11) {
-                playersValue += 11;
-            }
-            else if (playersCards[l].contains("A") && playersValue > 10){
-                playersValue += 1;
-            }
-            if (playersCards[l].contains("2")) {
-                playersValue += 2;
-            }
-            if (playersCards[l].contains("3")) {
-                playersValue += 3;
-            }
-            if (playersCards[l].contains("4")) {
-                playersValue += 4;
-            }
-            if (playersCards[l].contains("5")) {
-                playersValue += 5;
-            }
-            if (playersCards[l].contains("6")) {
-                playersValue += 6;
-            }
-            if (playersCards[l].contains("7")) {
-                playersValue += 7;
-            }
-            if (playersCards[l].contains("8")) {
-                playersValue += 8;
-            }
-            if (playersCards[l].contains("9")) {
-                playersValue += 9;
-            }
-            if (playersCards[l].contains("10") || playersCards[l].contains("J") || playersCards[l].contains("Q") || playersCards[l].contains("K")) {
-                playersValue += 10;
+    public static int ValueCalculator(String [] cards, int cardNumber) {
+        int value = 0;
+
+        for (int i = 2; i < 10; i++) {
+            for (int j = 0; j < cardNumber; j++) {
+                if (cards[j].contains(String.valueOf(i))) {
+                    value += i;
+                }
             }
         }
-        return playersValue;
+
+        for (int l = 0; l < cardNumber; l++) {
+            if (cards[l].contains("A") && value < 11) {
+                value += 11;
+            }
+            else if (cards[l].contains("A") && value > 10){
+                value += 1;
+            }
+
+            if (cards[l].contains("10") || cards[l].contains("J") || cards[l].contains("Q") || cards[l].contains("K")) {
+                value += 10;
+            }
+        }
+
+        for (int i = 0; i < cardNumber; i++) {
+            if (cards[i].contains("A") && value > 21) {
+                value -= 10;
+            }
+        }
+
+        return value;
     }
 }
