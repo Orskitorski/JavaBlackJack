@@ -76,9 +76,9 @@ public class Main {
             return new String[]{result, String.valueOf(playersValue), String.valueOf(topCard)}; //Om spelaren har fått BlackJack avslutas spelarens tur och alla värden returneras
         }
         for (int i = 2; i < 52; i++) {
-            System.out.println("Do you want to hit or stand?"); //Frågar spelaren om de vill ha fler kort (hit) eller vill avstå (stand)
+            System.out.println("Do you want to hit or stand? h/s"); //Frågar spelaren om de vill ha fler kort (hit) eller vill avstå (stand)
             String answer = tgb.nextLine();
-            if (answer.toLowerCase().contains("hit")) { //Går endast igenom koden om spelaren skriver hit
+            if (answer.toLowerCase().contains("h")) { //Går endast igenom koden om spelaren skriver hit
                 playersCardNumber++;
                 playersCards[i] = cardDeck[topCard]; //Sätter nästa kort i spelarens deck till det översta kortet i leken
                 topCard++;
@@ -104,7 +104,7 @@ public class Main {
                     return new String []{result, String.valueOf(ValueCalculator(playersCards, playersCardNumber)), String.valueOf(topCard)}; //Returnerar resultatet, spelarens poäng och toppkortsnumret
                 }
             }
-            else if (answer.toLowerCase().contains("stand")) { //Avslutar spelarens tur om spelaren skriver stand
+            else if (answer.toLowerCase().contains("s")) { //Avslutar spelarens tur om spelaren skriver stand
                 result = "Normal";
                 return new String []{result, String.valueOf(ValueCalculator(playersCards, playersCardNumber)), String.valueOf(topCard)}; //Returnerar resultatet, spelarens poäng och toppkortsnumret
             }
